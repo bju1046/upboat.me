@@ -15,7 +15,10 @@ namespace UpboatMe.App_Start
     public static class MemeConfig
     {
         private static readonly Regex StripCharactersToCollapseWords = new Regex(@"[']");
-        private static readonly Regex NonWordStripCharacters = new Regex(@"[_' -]", RegexOptions.Compiled);
+        private static readonly Regex NonWordStripCharacters = new Regex(
+            @"[_' -]",
+            RegexOptions.Compiled
+        );
         private static readonly Regex ShouldBeDisplayedAsWhitespaceCharacters = new Regex(@"[_-]");
 
         public static void AutoRegisterMemesByFile(MemeConfiguration memes, string[] filenames)
@@ -36,7 +39,7 @@ namespace UpboatMe.App_Start
                 name = name.Substring(lowerFilename.IndexOf("-", StringComparison.Ordinal) + 1);
 
                 var extension = Path.GetExtension(lowerFilename);
-                
+
                 if (extension == null)
                 {
                     throw new NullReferenceException("extension cannot be null");
@@ -44,17 +47,17 @@ namespace UpboatMe.App_Start
                 extension = extension.Substring(1); // strip off the dot
 
                 var aliases = new List<string>
-                                  {
-                                      name.ToInitialism(),
-                                      NonWordStripCharacters.Replace(name, ""),
-                                  };
+                {
+                    name.ToInitialism(),
+                    NonWordStripCharacters.Replace(name, ""),
+                };
 
                 var memeName = name.ToTitleString();
 
-                var filteredAliases =
-                    aliases.Where(a => a.Length > 1) // don't use single character aliases
-                           .Distinct()
-                           .ToList();
+                var filteredAliases = aliases
+                    .Where(a => a.Length > 1) // don't use single character aliases
+                    .Distinct()
+                    .ToList();
 
                 var survivingAliases = new List<string>();
                 // Note: don't follow resharper's advice on this loop. It be cray cray
@@ -73,22 +76,26 @@ namespace UpboatMe.App_Start
             }
         }
 
-        private static readonly Regex DigitPrefixRegex = new Regex(@"^(\d+)", RegexOptions.Compiled);
+        private static readonly Regex DigitPrefixRegex = new Regex(
+            @"^(\d+)",
+            RegexOptions.Compiled
+        );
+
         public static string ToInitialism(this string input)
         {
             var collapsedWords = StripCharactersToCollapseWords.Replace(input, "");
             var words = NonWordStripCharacters.Split(collapsedWords);
             var wordParts = words.Select(w =>
-                                             {
-                                                 // if the prefix is a number, take the whole number
-                                                 var possibleNumberPrefix = DigitPrefixRegex.Match(w);
-                                                 if (possibleNumberPrefix.Captures.Count > 0)
-                                                 {
-                                                     return possibleNumberPrefix.Captures[0].Value;
-                                                 }
-                                                 // otherwise just take the first character
-                                                 return w.Substring(0, 1);
-                                             });
+            {
+                // if the prefix is a number, take the whole number
+                var possibleNumberPrefix = DigitPrefixRegex.Match(w);
+                if (possibleNumberPrefix.Captures.Count > 0)
+                {
+                    return possibleNumberPrefix.Captures[0].Value;
+                }
+                // otherwise just take the first character
+                return w.Substring(0, 1);
+            });
 
             return string.Join("", wordParts);
         }
@@ -102,11 +109,16 @@ namespace UpboatMe.App_Start
             return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(memeName);
         }
 
-        public static readonly PrivateFontCollection PrivateFontCollection = new PrivateFontCollection();
+        public static readonly PrivateFontCollection PrivateFontCollection =
+            new PrivateFontCollection();
 
         public static void RegisterManualMemes(MemeConfiguration memes)
         {
-            var sfActionManExtendedFontPath = HttpRuntime.AppDomainAppPath + @"Fonts\SFActionManExtended.ttf";
+            var sfActionManExtendedFontPath = Path.Combine(
+                HttpRuntime.AppDomainAppPath,
+                "Fonts",
+                "SFActionManExtended.ttf"
+            );
             PrivateFontCollection.AddFontFile(sfActionManExtendedFontPath);
 
             // overrides
@@ -169,16 +181,16 @@ namespace UpboatMe.App_Start
             doge.Lines[0].Bounds = new Rectangle(30, 30, 400, 100);
             doge.Lines[0].Fill = Color.HotPink;
             doge.Lines[0].FontSize = 50;
-            
+
             doge.Lines[1].Bounds = new Rectangle(20, 120, 550, 100);
             doge.Lines[1].TextAlignment = StringAlignment.Far;
             doge.Lines[1].Fill = Color.ForestGreen;
             doge.Lines[1].FontSize = 32;
-            
+
             doge.Lines[2].Bounds = new Rectangle(50, 460, 400, 100);
             doge.Lines[2].Fill = Color.Yellow;
             doge.Lines[2].FontSize = 24;
-            
+
             doge.Lines[3].Bounds = new Rectangle(20, 530, 580, 100);
             doge.Lines[3].TextAlignment = StringAlignment.Far;
             doge.Lines[3].Fill = Color.Blue;

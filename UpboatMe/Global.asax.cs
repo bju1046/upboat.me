@@ -21,9 +21,12 @@ namespace UpboatMe
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
-            var filepaths = Directory.GetFiles(HttpContext.Current.Server.MapPath(@"~\Images"), "*.jpg");
+            var filepaths = Directory.GetFiles(
+                HttpContext.Current.Server.MapPath("~/Images"),
+                "*.jpg"
+            );
             var filenames = filepaths.Select(f => Path.GetFileName(f));
-            
+
             MemeConfig.AutoRegisterMemesByFile(GlobalMemeConfiguration.Memes, filenames.ToArray());
             MemeConfig.RegisterManualMemes(GlobalMemeConfiguration.Memes);
 
