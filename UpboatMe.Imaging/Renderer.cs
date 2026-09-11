@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using SkiaSharp;
 
 namespace UpboatMe.Imaging
@@ -134,7 +135,7 @@ namespace UpboatMe.Imaging
 
             DrawText(
                 canvas,
-                parameters.WatermarkText,
+                new[] { parameters.WatermarkText },
                 typeface,
                 parameters.WatermarkFontSize,
                 parameters.WatermarkStroke.WithAlpha(150),
@@ -175,7 +176,9 @@ namespace UpboatMe.Imaging
                     0
                 );
                 var metrics = measurePaint.FontMetrics;
-                var textHeight = metrics.Descent - metrics.Ascent;
+                var lines = WrapText(line.Text, measurePaint, bounds.Width);
+                var lineHeight = metrics.Descent - metrics.Ascent;
+                var textHeight = lineHeight * lines.Count;
 
                 if (textHeight > bounds.Height && fontSize > 10)
                 {
@@ -185,7 +188,7 @@ namespace UpboatMe.Imaging
 
                 DrawText(
                     canvas,
-                    line.Text,
+                    lines,
                     typeface,
                     fontSize,
                     line.Stroke,
@@ -273,7 +276,7 @@ namespace UpboatMe.Imaging
 
         private static void DrawText(
             SKCanvas canvas,
-            string text,
+            IReadOnlyList<string> lines,
             SKTypeface typeface,
             int fontSize,
             MemeColor stroke,
@@ -292,36 +295,108 @@ namespace UpboatMe.Imaging
                 0
             );
             var metrics = fillPaint.FontMetrics;
-            var textWidth = fillPaint.MeasureText(text);
-
-            var x = (float)bounds.X;
-            if (textAlignment == MemeTextAlignment.Center)
+            var lineHeight = metrics.Descent - metrics.Ascent;
+            for (var index = 0; index < lines.Count; index++)
             {
-                x = bounds.X + (bounds.Width - textWidth) / 2f;
+                var textWidth = fillPaint.MeasureText(lines[index]);
+                var x = (float)bounds.X;
+                if (textAlignment == MemeTextAlignment.Center)
+                {
+                    x = bounds.X + (bounds.Width - textWidth) / 2f;
+                }
+                else if (textAlignment == MemeTextAlignment.Far)
+                {
+                    x = bounds.Right - textWidth;
+                }
+
+                var baseline = bounds.Y - metrics.Ascent + index * lineHeight;
+
+                if (strokeWidth >= 0)
+                {
+                    using var path = fillPaint.GetTextPath(lines[index], x, baseline);
+                    using var strokePaint = CreateTextPaint(
+                        typeface,
+                        fontSize,
+                        stroke.ToSKColor(),
+                        SKPaintStyle.Stroke,
+                        strokeWidth
+                    );
+                    canvas.DrawPath(path, strokePaint);
+                    canvas.DrawPath(path, fillPaint);
+                }
+                else
+                {
+                    canvas.DrawText(lines[index], x, baseline, fillPaint);
+                }
             }
-            else if (textAlignment == MemeTextAlignment.Far)
+        }
+
+        internal static IReadOnlyList<string> WrapText(
+            string text,
+            SKPaint paint,
+            float maxWidth
+        )
+        {
+            var result = new List<string>();
+            foreach (var paragraph in text.Replace("\r\n", "\n").Split('\n'))
             {
-                x = bounds.Right - textWidth;
+                var words = paragraph.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+                var current = string.Empty;
+
+                foreach (var word in words)
+                {
+                    var candidate = string.IsNullOrEmpty(current)
+                        ? word
+                        : current + " " + word;
+                    if (paint.MeasureText(candidate) <= maxWidth)
+                    {
+                        current = candidate;
+                        continue;
+                    }
+
+                    if (!string.IsNullOrEmpty(current))
+                    {
+                        result.Add(current);
+                        current = string.Empty;
+                    }
+
+                    foreach (var character in SplitWordToFit(word, paint, maxWidth))
+                    {
+                        if (string.IsNullOrEmpty(current))
+                        {
+                            current = character;
+                        }
+                        else if (paint.MeasureText(current + character) <= maxWidth)
+                        {
+                            current += character;
+                        }
+                        else
+                        {
+                            result.Add(current);
+                            current = character;
+                        }
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(current) || words.Length == 0)
+                {
+                    result.Add(current);
+                }
             }
 
-            var baseline = bounds.Y - metrics.Ascent;
+            return result.Count == 0 ? new[] { string.Empty } : result;
+        }
 
-            if (strokeWidth >= 0)
+        private static IEnumerable<string> SplitWordToFit(
+            string word,
+            SKPaint paint,
+            float maxWidth
+        )
+        {
+            foreach (var character in word.Select(character => character.ToString()))
             {
-                using var path = fillPaint.GetTextPath(text, x, baseline);
-                using var strokePaint = CreateTextPaint(
-                    typeface,
-                    fontSize,
-                    stroke.ToSKColor(),
-                    SKPaintStyle.Stroke,
-                    strokeWidth
-                );
-                canvas.DrawPath(path, strokePaint);
-                canvas.DrawPath(path, fillPaint);
-                return;
+                yield return character;
             }
-
-            canvas.DrawText(text, x, baseline, fillPaint);
         }
 
         private static void DrawBoxes(

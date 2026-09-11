@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SkiaSharp;
 using UpboatMe.Imaging;
 
 namespace UpboatMeTests
@@ -9,6 +10,21 @@ namespace UpboatMeTests
     [TestClass]
     public class RendererTests
     {
+        [TestMethod]
+        public void WrapTextKeepsLinesWithinConfiguredWidth()
+        {
+            using var paint = new SKPaint { TextSize = 24, Typeface = SKTypeface.Default };
+
+            var lines = Renderer.WrapText(
+                "this is a deliberately long meme caption",
+                paint,
+                150
+            );
+
+            Assert.IsTrue(lines.Count > 1);
+            Assert.IsTrue(lines.All(line => paint.MeasureText(line) <= 150));
+        }
+
         [TestMethod]
         public void RenderDefaultFontMemeReturnsJpegBytes()
         {
