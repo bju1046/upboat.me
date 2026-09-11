@@ -14,12 +14,14 @@ namespace UpboatMeTests
         public void Init()
         {
             _MemeConfig = new MemeConfiguration();
-            _MemeConfig.Add(new Meme("Success Kid", "", new[] {"sk", "successkid"}));
-            _MemeConfig.Add(new Meme("I'll Have You Know", "", new[] {"ihyk", "illhaveyouknow"}));
+            _MemeConfig.Add(new Meme("Success Kid", "", new[] { "sk", "successkid" }));
+            _MemeConfig.Add(new Meme("I'll Have You Know", "", new[] { "ihyk", "illhaveyouknow" }));
             _MemeConfig.Add(new Meme("Foo", "", new[] { "f", "foo" }));
             _MemeConfig.Add(new Meme("All The Things", "", new[] { "att", "allthethings" }));
-            _MemeConfig.Add(new Meme("Chubby Bubbles Girl", "", new[] {"cbg", "chubbybubblesgirl"}));
-            _MemeConfig.Add(new Meme("Confession Bear", "", new[] {"cb", "confessionbear"}));
+            _MemeConfig.Add(
+                new Meme("Chubby Bubbles Girl", "", new[] { "cbg", "chubbybubblesgirl" })
+            );
+            _MemeConfig.Add(new Meme("Confession Bear", "", new[] { "cb", "confessionbear" }));
         }
 
         [TestMethod]
@@ -129,7 +131,8 @@ namespace UpboatMeTests
         public void FindMemeSearchNameLeadsWithMemeName()
         {
             // arrange
-            const string searchName = "ill-have-you-know-i-watched-the-notebook-and-only-cried-four-times";
+            const string searchName =
+                "ill-have-you-know-i-watched-the-notebook-and-only-cried-four-times";
             const string expectedName = "I'll Have You Know";
 
             // act
