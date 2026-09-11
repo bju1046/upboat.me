@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using System.Web;
-using System.Web.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using UpboatMe.Utilities;
 
 namespace UpboatMe.Models
@@ -12,11 +11,14 @@ namespace UpboatMe.Models
         public string SelectedMeme { get; set; }
         public IList<Meme> Memes { get; set; }
         public List<string> Lines { get; set; }
+        public string ApplicationPath { get; set; }
 
         private readonly Regex _previewUrlStripper = new Regex(@"\s+", RegexOptions.Compiled);
-        public MvcHtmlString GetPreviewUrl(UrlHelper helper)
+
+        public string GetPreviewUrl(IUrlHelper url)
         {
-            var root = HttpContext.Current.Request.ApplicationPath ?? "/";
+            var absoluteBaseUrl = url.AbsoluteAction("");
+            var root = string.IsNullOrEmpty(ApplicationPath) ? "/" : ApplicationPath;
             if (!root.EndsWith("/"))
             {
                 root += "/";
@@ -27,13 +29,17 @@ namespace UpboatMe.Models
             var trimmedPath = strippedPath.TrimEnd('/');
             var pathWithExtension = trimmedPath + ".jpg";
 
-            return MvcHtmlString.Create(helper.AbsoluteAction(pathWithExtension));
+            return string.Concat(absoluteBaseUrl.TrimEnd('/'), pathWithExtension);
         }
 
         public string GetAltText()
         {
-            return string.Format("{0}:{1}{2}",
-                                 SelectedMeme, Environment.NewLine, string.Join(Environment.NewLine, Lines));
+            return string.Format(
+                "{0}:{1}{2}",
+                SelectedMeme,
+                Environment.NewLine,
+                string.Join(Environment.NewLine, Lines)
+            );
         }
 
         public string GetShareText()

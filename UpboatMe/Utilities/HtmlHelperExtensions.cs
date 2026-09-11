@@ -1,31 +1,48 @@
-﻿using System.IO;
-using System.Web.Mvc;
-using System.Web.Mvc.Html;
-using System.Web.Routing;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Collections.Generic;
-using WorldWideWat.SpriteThumbs;
-using System.Web;
-using System.Web.Hosting;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace UpboatMe.Utilities
 {
     public static class HtmlHelperExtensions
     {
-        public static MvcHtmlString TopNavLink(this HtmlHelper helper, string text, string action, string controller, object routeValues, object htmlAttributes)
+        public static IHtmlContent TopNavLink(
+            this IHtmlHelper helper,
+            string text,
+            string action,
+            string controller,
+            object routeValues,
+            object htmlAttributes
+        )
         {
-            var isCurrent = 
-                string.Equals(helper.ViewContext.RouteData.Values["controller"].ToString(), controller, System.StringComparison.OrdinalIgnoreCase) &&
-                string.Equals(helper.ViewContext.RouteData.Values["action"].ToString(), action, System.StringComparison.OrdinalIgnoreCase);
+            var isCurrent =
+                string.Equals(
+                    helper.ViewContext.RouteData.Values["controller"].ToString(),
+                    controller,
+                    System.StringComparison.OrdinalIgnoreCase
+                )
+                && string.Equals(
+                    helper.ViewContext.RouteData.Values["action"].ToString(),
+                    action,
+                    System.StringComparison.OrdinalIgnoreCase
+                );
 
-            
-            var htmlAttributesCollection = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes ?? new object());
+            var htmlAttributesCollection = HtmlHelper.AnonymousObjectToHtmlAttributes(
+                htmlAttributes ?? new object()
+            );
 
             if (isCurrent)
             {
                 if (htmlAttributesCollection.ContainsKey("class"))
                 {
-                    htmlAttributesCollection["class"] = htmlAttributesCollection["class"] + " success";
+                    htmlAttributesCollection["class"] =
+                        htmlAttributesCollection["class"] + " success";
                 }
                 else
                 {
@@ -34,24 +51,35 @@ namespace UpboatMe.Utilities
             }
 
             var routeValuesDictionary = new RouteValueDictionary(routeValues);
-            IDictionary<string, object> attributesDictionary = htmlAttributesCollection.ToDictionary(k => k.Key, v => v.Value);
+            IDictionary<string, object> attributesDictionary =
+                htmlAttributesCollection.ToDictionary(k => k.Key, v => v.Value);
 
-            return helper.ActionLink(text, action, controller, routeValuesDictionary, attributesDictionary);
+            return helper.ActionLink(
+                text,
+                action,
+                controller,
+                routeValuesDictionary,
+                attributesDictionary
+            );
         }
 
-        public static MvcHtmlString ThumbImage(this HtmlHelper helper, string imageNameWithoutExtension)
+        public static IHtmlContent ThumbImage(
+            this IHtmlHelper helper,
+            string imageNameWithoutExtension
+        )
         {
-            var builder = new TagBuilder("div");
-
-            builder.AddCssClass(SpriteThumbsConfiguration.GetThumbClassName());
-            builder.AddCssClass(SpriteThumbsConfiguration.GetImageClassName(imageNameWithoutExtension));
-
-            return new MvcHtmlString(builder.ToString());
+            var builder = new TagBuilder("img");
+            builder.Attributes["src"] = $"/Images/{imageNameWithoutExtension}.jpg";
+            builder.Attributes["alt"] = imageNameWithoutExtension;
+            builder.AddCssClass("thumb");
+            return builder;
         }
 
-        public static string LastUpdated(this HtmlHelper helper)
+        public static string LastUpdated(this IHtmlHelper helper)
         {
-            var filePath = Path.Combine(HostingEnvironment.ApplicationPhysicalPath, "App_Data", "version.txt");
+            var env =
+                helper.ViewContext.HttpContext.RequestServices.GetRequiredService<IHostEnvironment>();
+            var filePath = Path.Combine(env.ContentRootPath, "App_Data", "version.txt");
             if (File.Exists(filePath))
             {
                 return File.ReadAllText(filePath);

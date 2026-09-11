@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
 using UpboatMe.Models;
 
 namespace UpboatMe.Utilities
@@ -21,20 +20,30 @@ namespace UpboatMe.Utilities
                 return null;
             }
 
-            var meme = memes[sanitizedName]
-                       ?? memes.GetMemes().FirstOrDefault(m => m.Aliases.Any(a => a.StartsWith(sanitizedName)))
-                       ?? memes.GetMemes().FirstOrDefault(m => m.Aliases.Any(a => a.EndsWith(sanitizedName)))
-                       ?? memes.GetMemes().FirstOrDefault(m => m.Aliases.Any(a => sanitizedName.StartsWith(a)))
-                       ?? memes.GetMemes().FirstOrDefault(m => m.Aliases.Any(a => sanitizedName.EndsWith(a)));
-
+            var meme =
+                memes[sanitizedName]
+                ?? memes
+                    .GetMemes()
+                    .FirstOrDefault(m => m.Aliases.Any(a => a.StartsWith(sanitizedName)))
+                ?? memes
+                    .GetMemes()
+                    .FirstOrDefault(m => m.Aliases.Any(a => a.EndsWith(sanitizedName)))
+                ?? memes
+                    .GetMemes()
+                    .FirstOrDefault(m => m.Aliases.Any(a => sanitizedName.StartsWith(a)))
+                ?? memes
+                    .GetMemes()
+                    .FirstOrDefault(m => m.Aliases.Any(a => sanitizedName.EndsWith(a)));
 
             return meme;
         }
 
-        private static readonly Regex _ActionNames =
-            new Regex("^(builder|debug)/", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-        
-        public static MemeRequest GetMemeRequest(string url)
+        private static readonly Regex _ActionNames = new Regex(
+            "^(builder|debug)/",
+            RegexOptions.Compiled | RegexOptions.IgnoreCase
+        );
+
+        public static MemeRequest GetMemeRequest(string url, string applicationPath)
         {
             var result = new MemeRequest();
 
@@ -44,7 +53,7 @@ namespace UpboatMe.Utilities
             }
 
             // strip off any application path prefix
-            var applicationPath = HttpContext.Current.Request.ApplicationPath ?? "/";
+            applicationPath = string.IsNullOrEmpty(applicationPath) ? "/" : applicationPath;
             if (applicationPath == "/")
             {
                 url = url.Substring(applicationPath.Length);
@@ -61,12 +70,9 @@ namespace UpboatMe.Utilities
             // urls look like this:  /meme-name/first-line/second-line
             // so we're basically delimiting on slashes
             // if there are surprise slashes, they'll end up in the second line
-            
-           
-            
 
             var firstSlash = url.IndexOf('/');
-            
+
             if (firstSlash > 0)
             {
                 result.Name = url.Substring(0, firstSlash);
@@ -80,11 +86,12 @@ namespace UpboatMe.Utilities
 
             if (url.Length > firstSlash)
             {
-                result.Lines = url.Substring(firstSlash + 1).Split(new[] { '/' }, StringSplitOptions.None).ToList();
+                result.Lines = url.Substring(firstSlash + 1)
+                    .Split(new[] { '/' }, StringSplitOptions.None)
+                    .ToList();
             }
 
             return result;
-
         }
     }
 }

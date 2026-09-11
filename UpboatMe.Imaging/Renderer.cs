@@ -1,163 +1,363 @@
-﻿using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
+using System;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.IO;
-using System.Linq;
+using SkiaSharp;
 
 namespace UpboatMe.Imaging
 {
     public class Renderer
     {
+        private static readonly IReadOnlyDictionary<string, string[]> FontFallbacks =
+            new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["Impact"] = new[]
+                {
+                    "Impact",
+                    "Arial Black",
+                    "Liberation Sans Narrow",
+                    "DejaVu Sans Condensed",
+                    "DejaVu Sans",
+                    "sans-serif",
+                },
+                ["Arial"] = new[] { "Arial", "Liberation Sans", "DejaVu Sans", "sans-serif" },
+                ["Comic Sans MS"] = new[]
+                {
+                    "Comic Sans MS",
+                    "Comic Neue",
+                    "Chilanka",
+                    "DejaVu Sans",
+                    "sans-serif",
+                },
+                ["Segoe UI"] = new[]
+                {
+                    "Segoe UI",
+                    "Noto Sans",
+                    "Liberation Sans",
+                    "DejaVu Sans",
+                    "sans-serif",
+                },
+            };
+
+        private readonly ConcurrentDictionary<string, SKTypeface> _privateTypefaces = new(
+            StringComparer.OrdinalIgnoreCase
+        );
+
         public byte[] Render(RenderParameters parameters)
         {
-            using (var image = Image.FromFile(parameters.FullImagePath))
-            using (var graphics = Graphics.FromImage(image))
+            using var baseBitmap = SKBitmap.Decode(parameters.FullImagePath);
+            if (baseBitmap == null)
             {
-                DrawWatermark(parameters, graphics, image);
-
-                foreach (var line in parameters.Lines)
-                {
-                    var maxHeightPercent = line.HeightPercent;
-                    var maxHeight = (int)Math.Ceiling(image.Height * (maxHeightPercent / 100));
-                    var bounds = line.Bounds ?? new Rectangle(0, 0, image.Width, maxHeight);
-                    var stringFormat = new StringFormat(StringFormat.GenericTypographic);
-
-                    stringFormat.Alignment = line.TextAlignment;
-                    stringFormat.LineAlignment = StringAlignment.Near;
-
-                    if (line.HugBottom)
-                    {
-                        stringFormat.LineAlignment = StringAlignment.Far;
-                        bounds.Y = image.Height - bounds.Height - 1;
-                    }
-                    
-                    DrawText(parameters, graphics, image, line, bounds, stringFormat);
-                }
-                  
-                using (var memoryStream = new MemoryStream())
-                {
-                    image.Save(memoryStream, image.RawFormat);
-
-                    return memoryStream.ToArray();
-                }
+                throw new InvalidOperationException(
+                    $"Unable to decode image at {parameters.FullImagePath}."
+                );
             }
+
+            using var image = new SKBitmap(
+                baseBitmap.Width,
+                baseBitmap.Height,
+                baseBitmap.ColorType,
+                baseBitmap.AlphaType
+            );
+            using var canvas = new SKCanvas(image);
+            canvas.DrawBitmap(baseBitmap, 0, 0);
+
+            DrawWatermark(parameters, canvas, image.Width, image.Height);
+
+            foreach (var line in parameters.Lines)
+            {
+                DrawLine(parameters, canvas, image.Width, image.Height, line);
+            }
+
+            using var encoded = EncodeByFileExtension(image, parameters.FullImagePath);
+            return encoded.ToArray();
         }
 
-        private void DrawWatermark(RenderParameters parameters, Graphics graphics, Image image)
+        private static SKData EncodeByFileExtension(SKBitmap image, string fullImagePath)
         {
-            using (var watermark = Image.FromFile(parameters.FullWatermarkImageFilePath))
-            {
-                var padding = 2;
-                var width = parameters.WatermarkImageWidth;
-                var height = parameters.WatermarkImageHeight;
-                var sourceRectangle = new Rectangle(0, 0, watermark.Width, watermark.Height);
-                var destinationRectangle = new Rectangle(image.Width - width - padding, image.Height - height - padding, width, height);
+            var extension = Path.GetExtension(fullImagePath) ?? string.Empty;
+            var format = extension.Equals(".png", StringComparison.OrdinalIgnoreCase)
+                ? SKEncodedImageFormat.Png
+                : SKEncodedImageFormat.Jpeg;
 
-                graphics.DrawImage(watermark, destinationRectangle, sourceRectangle, GraphicsUnit.Pixel);
-
-                var font = new Font(parameters.WatermarkFont, parameters.WatermarkFontSize);
-
-                var textSize = graphics.MeasureString(parameters.WatermarkText, font);
-
-                var bounds = new Rectangle(image.Width - width - (int)Math.Ceiling(textSize.Width), image.Height - (int)Math.Ceiling(textSize.Height), image.Width, (int)Math.Ceiling(textSize.Height));
-
-                graphics.CompositingMode = CompositingMode.SourceOver;
-
-                var stroke = new SolidBrush(Color.FromArgb(150, parameters.WatermarkStroke));
-                var fill = new SolidBrush(Color.FromArgb(150, parameters.WatermarkFill));
-                
-                DrawText(graphics, parameters.WatermarkText, font, parameters.WatermarkFontStyle, parameters.WatermarkFontSize, stroke, parameters.WatermarkStrokeWidth, fill, StringFormat.GenericTypographic, bounds);
-
-                graphics.CompositingMode = CompositingMode.SourceCopy;
-            }
+            using var skImage = SKImage.FromBitmap(image);
+            return skImage.Encode(format, 90);
         }
 
-        private void DrawText(RenderParameters parameters, Graphics graphics, Image image, LineParameters line, Rectangle bounds, StringFormat stringFormat)
+        private void DrawWatermark(
+            RenderParameters parameters,
+            SKCanvas canvas,
+            int imageWidth,
+            int imageHeight
+        )
         {
-            var done = false;
+            var padding = 2;
+            var width = parameters.WatermarkImageWidth;
+            var height = parameters.WatermarkImageHeight;
+
+            using (var watermark = SKBitmap.Decode(parameters.FullWatermarkImageFilePath))
+            {
+                if (watermark != null)
+                {
+                    var destination = new SKRect(
+                        imageWidth - width - padding,
+                        imageHeight - height - padding,
+                        imageWidth - padding,
+                        imageHeight - padding
+                    );
+                    canvas.DrawBitmap(watermark, destination);
+                }
+            }
+
+            var typeface = ResolveTypeface(
+                parameters,
+                parameters.WatermarkFont,
+                parameters.WatermarkFontStyle
+            );
+            using var fillPaint = CreateTextPaint(
+                typeface,
+                parameters.WatermarkFontSize,
+                parameters.WatermarkFill.WithAlpha(150).ToSKColor(),
+                SKPaintStyle.Fill,
+                0
+            );
+            var metrics = fillPaint.FontMetrics;
+            var textWidth = fillPaint.MeasureText(parameters.WatermarkText);
+            var textHeight = metrics.Descent - metrics.Ascent;
+            var bounds = new MemeRectangle(
+                imageWidth - width - (int)Math.Ceiling(textWidth),
+                imageHeight - (int)Math.Ceiling(textHeight),
+                imageWidth,
+                (int)Math.Ceiling(textHeight)
+            );
+
+            DrawText(
+                canvas,
+                parameters.WatermarkText,
+                typeface,
+                parameters.WatermarkFontSize,
+                parameters.WatermarkStroke.WithAlpha(150),
+                parameters.WatermarkStrokeWidth,
+                parameters.WatermarkFill.WithAlpha(150),
+                parameters.WatermarkFontStyle,
+                MemeTextAlignment.Near,
+                bounds
+            );
+        }
+
+        private void DrawLine(
+            RenderParameters parameters,
+            SKCanvas canvas,
+            int imageWidth,
+            int imageHeight,
+            LineParameters line
+        )
+        {
+            var maxHeight = (int)Math.Ceiling(imageHeight * (line.HeightPercent / 100));
+            var bounds = line.Bounds ?? new MemeRectangle(0, 0, imageWidth, maxHeight);
+
+            if (line.HugBottom)
+            {
+                bounds.Y = imageHeight - bounds.Height - 1;
+            }
+
             var fontSize = line.FontSize;
-            var fontFamily = FindFont(parameters, line.Font);
+            var typeface = ResolveTypeface(parameters, line.Font, line.FontStyle);
 
-            while (!done)
+            while (true)
             {
-                var font = new Font(fontFamily, fontSize, FontStyle.Regular);
+                using var measurePaint = CreateTextPaint(
+                    typeface,
+                    fontSize,
+                    line.Fill.ToSKColor(),
+                    SKPaintStyle.Fill,
+                    0
+                );
+                var metrics = measurePaint.FontMetrics;
+                var textHeight = metrics.Descent - metrics.Ascent;
 
-                var size = graphics.MeasureString(line.Text, font, bounds.Width);
-                
-                if (size.Height > bounds.Size.Height && fontSize > 10)
+                if (textHeight > bounds.Height && fontSize > 10)
                 {
                     fontSize -= 2;
                     continue;
                 }
 
-                var stroke = new SolidBrush(line.Stroke);
-                var fill = new SolidBrush(line.Fill);
-
-                DrawText(graphics, line.Text, font, line.FontStyle, fontSize, stroke, line.StrokeWidth, fill, stringFormat, bounds);
+                DrawText(
+                    canvas,
+                    line.Text,
+                    typeface,
+                    fontSize,
+                    line.Stroke,
+                    line.StrokeWidth,
+                    line.Fill,
+                    line.FontStyle,
+                    line.TextAlignment,
+                    bounds
+                );
 
                 if (parameters.DebugMode)
                 {
-                    DrawBoxes(graphics, image.Width, image.Height, bounds);
+                    DrawBoxes(canvas, imageWidth, imageHeight, bounds);
                 }
 
-                done = true;
+                break;
             }
         }
 
-        private static FontFamily FindFont(RenderParameters parameters, string font)
+        private SKTypeface ResolveTypeface(
+            RenderParameters parameters,
+            string fontName,
+            MemeFontStyle style
+        )
         {
-            var fontFamily = parameters.PrivateFonts.Families.FirstOrDefault(f => f.Name == font)
-                             ?? FontFamily.Families.FirstOrDefault(f => f.Name == font);
-
-            if (fontFamily == null)
+            if (
+                parameters.PrivateFontFiles.TryGetValue(fontName, out var fontFilePath)
+                && File.Exists(fontFilePath)
+            )
             {
-                throw new ArgumentException(string.Format("Font {0} could not be found", font));
+                return _privateTypefaces.GetOrAdd(fontName, _ => SKTypeface.FromFile(fontFilePath));
             }
 
-            return fontFamily;
-        }
-
-        private static void DrawText(Graphics graphics, string text, Font font, FontStyle fontStyle, int fontSize, Brush stroke, int strokeWidth, Brush fill, StringFormat stringFormat, Rectangle bounds)
-        {
-            using (var graphicsPath = new GraphicsPath())
+            var skStyle = style switch
             {
-                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                MemeFontStyle.Bold => SKFontStyle.Bold,
+                MemeFontStyle.Italic => SKFontStyle.Italic,
+                MemeFontStyle.BoldItalic => SKFontStyle.BoldItalic,
+                _ => SKFontStyle.Normal,
+            };
 
-                float emSize = graphics.DpiY * fontSize / 72;
+            var candidates = FontFallbacks.TryGetValue(fontName, out var fallbackCandidates)
+                ? fallbackCandidates
+                : new[] { fontName, "sans-serif" };
 
-                if (strokeWidth >= 0)
+            foreach (var candidate in candidates)
+            {
+                var resolved = SKTypeface.FromFamilyName(candidate, skStyle);
+                if (resolved != null)
                 {
-                    graphicsPath.AddString(text, font.FontFamily, (int) fontStyle, emSize, bounds, stringFormat);
-                    graphics.DrawPath(new Pen(stroke, strokeWidth) {LineJoin = LineJoin.Round}, graphicsPath);
-                    graphics.FillPath(fill, graphicsPath);
+                    return resolved;
                 }
-                else
-                {
-                    font = new Font(font, fontStyle);
-                    graphics.CompositingMode = CompositingMode.SourceOver;
-                    graphics.DrawString(text, font, fill, bounds, stringFormat);
-                }
-                graphics.SmoothingMode = SmoothingMode.Default;
             }
+
+            return SKTypeface.Default;
         }
 
-        private static void DrawBoxes(Graphics graphics, int width, int height, Rectangle bounds)
+        private static SKPaint CreateTextPaint(
+            SKTypeface typeface,
+            float fontSize,
+            SKColor color,
+            SKPaintStyle style,
+            float strokeWidth
+        )
         {
-            graphics.CompositingMode = CompositingMode.SourceOver;
-
-            var brush = new SolidBrush(Color.FromArgb(150, Color.Red));
-
-            graphics.FillRectangle(brush, bounds);
-
-            for (int x = 0; x < height; x += 20)
+            return new SKPaint
             {
-                graphics.DrawString(x.ToString(CultureInfo.InvariantCulture), SystemFonts.DefaultFont, Brushes.Black, 0, x);
+                IsAntialias = true,
+                Typeface = typeface,
+                TextSize = fontSize,
+                Color = color,
+                Style = style,
+                StrokeWidth = strokeWidth,
+                StrokeJoin = SKStrokeJoin.Round,
+            };
+        }
+
+        private static void DrawText(
+            SKCanvas canvas,
+            string text,
+            SKTypeface typeface,
+            int fontSize,
+            MemeColor stroke,
+            int strokeWidth,
+            MemeColor fill,
+            MemeFontStyle fontStyle,
+            MemeTextAlignment textAlignment,
+            MemeRectangle bounds
+        )
+        {
+            using var fillPaint = CreateTextPaint(
+                typeface,
+                fontSize,
+                fill.ToSKColor(),
+                SKPaintStyle.Fill,
+                0
+            );
+            var metrics = fillPaint.FontMetrics;
+            var textWidth = fillPaint.MeasureText(text);
+
+            var x = (float)bounds.X;
+            if (textAlignment == MemeTextAlignment.Center)
+            {
+                x = bounds.X + (bounds.Width - textWidth) / 2f;
+            }
+            else if (textAlignment == MemeTextAlignment.Far)
+            {
+                x = bounds.Right - textWidth;
             }
 
-            graphics.DrawString(string.Format("H: {0}, W: {1}", height, width), SystemFonts.DefaultFont, Brushes.Black, width / 2f, 20);
+            var baseline = bounds.Y - metrics.Ascent;
 
-            graphics.CompositingMode = CompositingMode.SourceCopy;
+            if (strokeWidth >= 0)
+            {
+                using var path = fillPaint.GetTextPath(text, x, baseline);
+                using var strokePaint = CreateTextPaint(
+                    typeface,
+                    fontSize,
+                    stroke.ToSKColor(),
+                    SKPaintStyle.Stroke,
+                    strokeWidth
+                );
+                canvas.DrawPath(path, strokePaint);
+                canvas.DrawPath(path, fillPaint);
+                return;
+            }
+
+            canvas.DrawText(text, x, baseline, fillPaint);
+        }
+
+        private static void DrawBoxes(
+            SKCanvas canvas,
+            int imageWidth,
+            int imageHeight,
+            MemeRectangle bounds
+        )
+        {
+            using (
+                var brush = new SKPaint
+                {
+                    Color = new SKColor(255, 0, 0, 150),
+                    Style = SKPaintStyle.Fill,
+                }
+            )
+            {
+                canvas.DrawRect(
+                    new SKRect(bounds.X, bounds.Y, bounds.Right, bounds.Y + bounds.Height),
+                    brush
+                );
+            }
+
+            using var textPaint = new SKPaint
+            {
+                Color = SKColors.Black,
+                TextSize = 12,
+                IsAntialias = true,
+                Typeface = SKTypeface.Default,
+            };
+
+            for (var y = 0; y < imageHeight; y += 20)
+            {
+                canvas.DrawText(y.ToString(CultureInfo.InvariantCulture), 0, y, textPaint);
+            }
+
+            canvas.DrawText($"H: {imageHeight}, W: {imageWidth}", imageWidth / 2f, 20, textPaint);
+        }
+    }
+
+    internal static class MemeColorExtensions
+    {
+        public static SKColor ToSKColor(this MemeColor color)
+        {
+            return new SKColor(color.R, color.G, color.B, color.A);
         }
     }
 }

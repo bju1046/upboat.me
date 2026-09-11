@@ -76,6 +76,10 @@ hr {
     border: 1px dashed #2284a1;
 }
 
+.row.list-page-row {
+    max-width: 100em;
+}
+
 
 a.meme-thumb {
     display: inline-block;

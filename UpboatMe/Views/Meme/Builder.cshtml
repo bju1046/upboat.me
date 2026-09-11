@@ -5,11 +5,11 @@
 }
 
 
-@Html.Partial("BuilderPartial", Model)
+@await Html.PartialAsync("BuilderPartial", Model)
 @section scripts {
-    @Scripts.Render("~/bundles/builder")
+    <script src="@Url.VersionedContent("~/Scripts/builder.js")"></script>
     <script type="text/javascript">
-        var rootUrl = '@Url.Action("Index", "Home", null, Request.Url.Scheme)';
+        var rootUrl = '@Url.AbsoluteAction("/")';
         var builderPath = 'Builder/';
         builder.init(rootUrl, builderPath);
     </script>

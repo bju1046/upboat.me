@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 
 namespace UpboatMe.Utilities
 {
@@ -19,7 +18,8 @@ namespace UpboatMe.Utilities
             if (instance == null)
             {
                 int seed;
-                lock (Global) seed = Global.Next();
+                lock (Global)
+                    seed = Global.Next();
                 _local = instance = new Random(seed);
             }
             return instance.Next(minValue, maxValue);

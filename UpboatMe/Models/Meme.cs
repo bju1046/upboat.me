@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
+using UpboatMe.Imaging;
 
 namespace UpboatMe.Models
 {
@@ -21,8 +20,12 @@ namespace UpboatMe.Models
             get { return Path.GetFileNameWithoutExtension(ImageFileName); }
         }
 
-
-        public Meme(string description, string imageFileName, IList<string> aliases, string imageType = "image/jpg")
+        public Meme(
+            string description,
+            string imageFileName,
+            IList<string> aliases,
+            string imageType = "image/jpg"
+        )
         {
             Description = description;
             ImagePath = string.Format(ImagePathFormat, imageFileName);
@@ -31,43 +34,41 @@ namespace UpboatMe.Models
             ImageType = imageType;
 
             // Default meme has 2 lines, the second one hugs the bottom of the image
-            Lines = new List<LineConfig>
-            {
-                new LineConfig(),
-                new LineConfig(hugBottom: true),
-            };
+            Lines = new List<LineConfig> { new LineConfig(), new LineConfig(hugBottom: true) };
         }
     }
 
     public class LineConfig
     {
-        public Color Stroke { get; set; }
-        public Color Fill { get; set; }
+        public MemeColor Stroke { get; set; }
+        public MemeColor Fill { get; set; }
         public string Font { get; set; }
         public int FontSize { get; set; }
-        public FontStyle FontStyle { get; set; }
+        public MemeFontStyle FontStyle { get; set; }
         public int StrokeWidth { get; set; }
-        public StringAlignment TextAlignment { get; set; }
-        public StringAlignment LineAlignment { get; set; }
+        public MemeTextAlignment TextAlignment { get; set; }
+        public MemeTextAlignment LineAlignment { get; set; }
         public bool DoForceTextToAllCaps { get; set; }
         public float HeightPercent { get; set; }
-        public Rectangle? Bounds { get; set; }
+        public MemeRectangle? Bounds { get; set; }
         public bool HugBottom { get; set; }
 
-        public LineConfig(string stroke = "black",
+        public LineConfig(
+            string stroke = "black",
             string fill = "white",
             string font = "Impact",
-            FontStyle fontStyle = FontStyle.Regular,
+            MemeFontStyle fontStyle = MemeFontStyle.Regular,
             int fontSize = 40,
             int strokeWidth = 5,
             float heightPercent = 25,
-            StringAlignment textAlignment = StringAlignment.Center,
-            StringAlignment lineAlignment = StringAlignment.Near,
+            MemeTextAlignment textAlignment = MemeTextAlignment.Center,
+            MemeTextAlignment lineAlignment = MemeTextAlignment.Near,
             bool doForceTextToAllCaps = true,
-            bool hugBottom = false)
+            bool hugBottom = false
+        )
         {
-            Stroke = Color.FromName(stroke);
-            Fill = Color.FromName(fill);
+            Stroke = MemeColors.FromName(stroke);
+            Fill = MemeColors.FromName(fill);
             Font = font;
             FontSize = fontSize;
             StrokeWidth = strokeWidth;

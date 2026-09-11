@@ -1,24 +1,24 @@
 ﻿@model UpboatMe.Models.IndexViewModel
 
 
-@Html.Partial("HowTo")
+@await Html.PartialAsync("HowTo")
 
 <div class="row"><hr /></div>
 
 <div class="row"><div class="large-12 columns"><h2>builder</h2></div></div>
 
-@Html.Partial("BuilderPartial", Model.BuilderViewModel)
+@await Html.PartialAsync("BuilderPartial", Model.BuilderViewModel)
 
 <div class="row"><hr /></div>
 
 <div class="row"><div class="large-12 columns"><h2>examples</h2></div></div>
 
-@Html.Partial("RecentMemes", Model.RecentMemes)
+@await Html.PartialAsync("RecentMemes", Model.RecentMemes)
 
 @section scripts {
-    @Scripts.Render("~/bundles/builder")
+    <script src="@Url.VersionedContent("~/Scripts/builder.js")"></script>
     <script type="text/javascript">
-        var rootUrl = '@Url.Action("Index", "Home", null, Request.Url.Scheme)';
+        var rootUrl = '@Url.AbsoluteAction("/")';
         builder.init(rootUrl);
     </script>
 }

@@ -1,484 +1,53 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build"
-  xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>
-    </ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{292B8EBA-5E58-46F1-9E04-1EA563325262}</ProjectGuid>
-    <ProjectTypeGuids>{E3E379DF-F4C6-4180-9B81-6769533ABE47};{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UpboatMe</RootNamespace>
-    <AssemblyName>UpboatMe</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <MvcBuildViews>false</MvcBuildViews>
-    <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
-    <IISExpressAnonymousAuthentication>enabled</IISExpressAnonymousAuthentication>
-    <IISExpressWindowsAuthentication>enabled</IISExpressWindowsAuthentication>
-    <IISExpressUseClassicPipelineMode>false</IISExpressUseClassicPipelineMode>
-    <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
-    <RestorePackages>true</RestorePackages>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="Antlr3.Runtime">
-      <HintPath>..\packages\WebGrease.1.1.0\lib\Antlr3.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="GoogleAnalyticsTracker">
-      <HintPath>..\packages\GoogleAnalyticsTracker.1.5.000\lib\net40\GoogleAnalyticsTracker.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="NewRelic.Api.Agent, Version=2.23.2.0, Culture=neutral, PublicKeyToken=06552fced0b33d87, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\NewRelic.Azure.WebSites.2.23.2.0\lib\NewRelic.Api.Agent.dll</HintPath>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Newtonsoft.Json.5.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Drawing" />
-    <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Web.DynamicData" />
-    <Reference Include="System.Web.Entity" />
-    <Reference Include="System.Web.ApplicationServices" />
-    <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Web.Optimization">
-      <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.0.0\lib\net40\System.Web.Optimization.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Web" />
-    <Reference Include="System.Web.Extensions" />
-    <Reference Include="System.Web.Abstractions" />
-    <Reference Include="System.Web.Routing" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Configuration" />
-    <Reference Include="System.Web.Services" />
-    <Reference Include="System.EnterpriseServices" />
-    <Reference Include="Microsoft.Web.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http">
-    </Reference>
-    <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Net.Http.WebRequest">
-    </Reference>
-    <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.Helpers.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.20710.0\lib\net40\System.Web.Mvc.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.20710.0\lib\net40\System.Web.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
-    </Reference>
-    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\WebActivatorEx.2.0.2\lib\net40\WebActivatorEx.dll</HintPath>
-    </Reference>
-    <Reference Include="WebGrease">
-      <HintPath>..\packages\WebGrease.1.1.0\lib\WebGrease.dll</HintPath>
-    </Reference>
-    <Reference Include="WorldWideWat.SpriteThumbs, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\WorldWideWat.SpriteThumbs.0.1.1\lib\WorldWideWat.SpriteThumbs.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\UpboatMe.Imaging\UpboatMe.Imaging.csproj" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="App_Start\BundleConfig.cs" />
-    <Compile Include="App_Start\SpriteThumbsConfig.cs" />
-    <Compile Include="Models\ApiMemeResult.cs" />
-    <Compile Include="Controllers\ListController.cs" />
-    <Compile Include="Models\BuilderViewModel.cs" />
-    <Compile Include="Models\IndexViewModel.cs" />
-    <Compile Include="Models\MemeRequest.cs" />
-    <Compile Include="Models\RecentMeme.cs" />
-    <Compile Include="Modules\HideServerHeaderModule.cs" />
-    <Compile Include="Utilities\Analytics.cs" />
-    <Compile Include="Utilities\CollectionExtensions.cs" />
-    <Compile Include="Utilities\HtmlHelperExtensions.cs" />
-    <Compile Include="Utilities\MemeUtilities.cs" />
-    <Compile Include="Utilities\SloganUtilities.cs" />
-    <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Models\Meme.cs" />
-    <Compile Include="Models\GlobalMemeConfiguration.cs" />
-    <Compile Include="App_Start\MemeConfig.cs" />
-    <Compile Include="Controllers\MemeController.cs" />
-    <Compile Include="Global.asax.cs">
-      <DependentUpon>Global.asax</DependentUpon>
-    </Compile>
-    <Compile Include="Models\MemeConfiguration.cs" />
-    <Compile Include="Models\MemeDebugViewModel.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utilities\StringExtensionMethods.cs" />
-    <Compile Include="Utilities\ThreadRandom.cs" />
-    <Compile Include="Utilities\UrlHelperExtensionMethods.cs" />
+    <Compile Remove="App_Start\BundleConfig.cs" />
+    <Compile Remove="App_Start\FilterConfig.cs" />
+    <Compile Remove="App_Start\RouteConfig.cs" />
+    <Compile Remove="App_Start\SpriteThumbsConfig.cs" />
+    <Compile Remove="App_Start\WebApiConfig.cs" />
+    <Compile Remove="Global.asax.cs" />
+    <Compile Remove="Modules\HideServerHeaderModule.cs" />
+    <Compile Remove="Utilities\Analytics.cs" />
   </ItemGroup>
+
   <ItemGroup>
-    <Compile Include="App_Start\FilterConfig.cs" />
-    <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="App_Start\WebApiConfig.cs" />
-    <Content Include="App_Data\slogans.txt" />
-    <Content Include="App_Data\version.txt" />
-    <Content Include="Content\apple-touch-icon-precomposed.png" />
-    <Content Include="Content\banana-example-320.jpg" />
-    <Content Include="Content\foundation\foundation.css" />
-    <Content Include="Content\foundation\normalize.css" />
-    <Content Include="Content\social\24px\facebook.png" />
-    <Content Include="Content\social\24px\google-plus.png" />
-    <Content Include="Content\social\24px\pinterest.png" />
-    <Content Include="Content\social\24px\reddit.png" />
-    <Content Include="Content\social\24px\twitter.png" />
-    <Content Include="Content\styles.css" />
-    <Content Include="Content\UpBoat128.png" />
-    <Content Include="Content\UpBoat32.png" />
-    <Content Include="Content\UpBoat64.png" />
-    <Content Include="Content\UpBoatWatermark.png" />
-    <Content Include="Content\url-example.png" />
-    <Content Include="Content\vote-right.png" />
-    <Content Include="Content\vote-up.png" />
-    <Content Include="favicon.ico" />
-    <Content Include="Foundation_readme.txt" />
-    <Content Include="Global.asax" />
-    <Content Include="Images\0000-10-guy.jpg" />
-    <Content Include="Images\0001-1950s-middle-finger.jpg" />
-    <Content Include="Images\0002-1990s-first-world-problems.jpg" />
-    <Content Include="Images\0003-aaaaand-its-gone.jpg" />
-    <Content Include="Images\0004-actual-advice-mallard.jpg" />
-    <Content Include="Images\0005-advice-dog.jpg" />
-    <Content Include="Images\0006-advice-god.jpg" />
-    <Content Include="Images\0007-advice-yoda.jpg" />
-    <Content Include="Images\0008-all-the-things.jpg" />
-    <Content Include="Images\0009-ancient-aliens.jpg" />
-    <Content Include="Images\0010-angry-chef-gordon-ramsay.jpg" />
-    <Content Include="Images\0011-angry-walter.jpg" />
-    <Content Include="Images\0012-annoyed-picard.jpg" />
-    <Content Include="Images\0013-annoying-facebook-girl.jpg" />
-    <Content Include="Images\0014-anti-joke-chicken.jpg" />
-    <Content Include="Images\0015-aw-yeah-rage-face.jpg" />
-    <Content Include="Images\0016-baby-godfather.jpg" />
-    <Content Include="Images\0017-back-in-my-day.jpg" />
-    <Content Include="Images\0018-bad-joke-eel.jpg" />
-    <Content Include="Images\0019-bad-luck-brian.jpg" />
-    <Content Include="Images\0020-batman-slapping-robin.jpg" />
-    <Content Include="Images\0021-bear-grylls.jpg" />
-    <Content Include="Images\0022-beyonce-superbowl-yell.jpg" />
-    <Content Include="Images\0023-bill-murray-golf.jpg" />
-    <Content Include="Images\0024-boy-that-escalated-quickly.jpg" />
-    <Content Include="Images\0025-brace-yourselves.jpg" />
-    <Content Include="Images\0026-buddy-christ.jpg" />
-    <Content Include="Images\0027-buddy-the-elf.jpg" />
-    <Content Include="Images\0028-business-cat.jpg" />
-    <Content Include="Images\0029-butthurt-dweller.jpg" />
-    <Content Include="Images\0030-captain-hindsight.jpg" />
-    <Content Include="Images\0031-captain-picard-facepalm.jpg" />
-    <Content Include="Images\0032-cereal-guy-spitting.jpg" />
-    <Content Include="Images\0033-challenge-accepted-rage-face.jpg" />
-    <Content Include="Images\0034-chavez.jpg" />
-    <Content Include="Images\0035-chef-gordon-ramsay.jpg" />
-    <Content Include="Images\0036-chemistry-cat.jpg" />
-    <Content Include="Images\0037-chubby-bubbles-girl.jpg" />
-    <Content Include="Images\0038-college-freshman.jpg" />
-    <Content Include="Images\0039-college-liberal.jpg" />
-    <Content Include="Images\0040-computer-guy-facepalm.jpg" />
-    <Content Include="Images\0041-computer-guy.jpg" />
-    <Content Include="Images\0042-condescending-wonka.jpg" />
-    <Content Include="Images\0043-confession-kid.jpg" />
-    <Content Include="Images\0044-confused-lebowski.jpg" />
-    <Content Include="Images\0045-conspiracy-keanu.jpg" />
-    <Content Include="Images\0046-consuela.jpg" />
-    <Content Include="Images\0047-courage-wolf.jpg" />
-    <Content Include="Images\0048-crying-because-of-cute.jpg" />
-    <Content Include="Images\0049-dating-site-murderer.jpg" />
-    <Content Include="Images\0050-derp.jpg" />
-    <Content Include="Images\0051-derpina.jpg" />
-    <Content Include="Images\0052-disaster-girl.jpg" />
-    <Content Include="Images\0053-dj-pauly-d.jpg" />
-    <Content Include="Images\0054-down-syndrome.jpg" />
-    <Content Include="Images\0055-downvoting-roman.jpg" />
-    <Content Include="Images\0056-drunk-baby.jpg" />
-    <Content Include="Images\0057-dwight-schrute.jpg" />
-    <Content Include="Images\0058-engineering-professor.jpg" />
-    <Content Include="Images\0059-ermahgerd-beyonce.jpg" />
-    <Content Include="Images\0060-ermahgerd.jpg" />
-    <Content Include="Images\0061-everyone-loses-their-minds.jpg" />
-    <Content Include="Images\0062-evil-otter.jpg" />
-    <Content Include="Images\0063-evil-plotting-raccoon.jpg" />
-    <Content Include="Images\0064-evil-toddler.jpg" />
-    <Content Include="Images\0065-family-guy-peter.jpg" />
-    <Content Include="Images\0066-first-day-on-the-internet-kid.jpg" />
-    <Content Include="Images\0067-first-world-problems.jpg" />
-    <Content Include="Images\0068-fk-yeah.jpg" />
-    <Content Include="Images\0069-forever-alone.jpg" />
-    <Content Include="Images\0070-foul-bachelor-frog.jpg" />
-    <Content Include="Images\0071-futurama-fry.jpg" />
-    <Content Include="Images\0072-futurama-leela.jpg" />
-    <Content Include="Images\0073-gasp-rage-face.jpg" />
-    <Content Include="Images\0074-gollum.jpg" />
-    <Content Include="Images\0075-good-guy-greg.jpg" />
-    <Content Include="Images\0075-great-guy-greg.jpg" />
-    <Content Include="Images\0076-grumpy-cat.jpg" />
-    <Content Include="Images\0077-happy-guy-rage-face.jpg" />
-    <Content Include="Images\0078-heres-johnny.jpg" />
-    <Content Include="Images\0079-hide-yo-kids-hide-yo-wife.jpg" />
-    <Content Include="Images\0080-high-expectations-asian-father.jpg" />
-    <Content Include="Images\0081-hipster-ariel.jpg" />
-    <Content Include="Images\0082-hipster-barista.jpg" />
-    <Content Include="Images\0083-i-dont-want-to-live-on-this-planet-anymore.jpg" />
-    <Content Include="Images\0084-i-should-buy-a-boat-cat.jpg" />
-    <Content Include="Images\0085-i-too-like-to-live-dangerously.jpg" />
-    <Content Include="Images\0086-idiot-nerd-girl.jpg" />
-    <Content Include="Images\0087-if-you-know-what-i-mean-bean.jpg" />
-    <Content Include="Images\0088-ill-have-you-know.jpg" />
-    <Content Include="Images\0089-impossibru-guy-original.jpg" />
-    <Content Include="Images\0090-insanity-wolf.jpg" />
-    <Content Include="Images\0091-internet-grandma-surprise.jpg" />
-    <Content Include="Images\0092-internet-guide.jpg" />
-    <Content Include="Images\0093-irrationally-hostile-mark.jpg" />
-    <Content Include="Images\0094-jackie-chan-wtf.jpg" />
-    <Content Include="Images\0095-joseph-ducreux.jpg" />
-    <Content Include="Images\0095-kim-jong-ill.jpg" />
-    <Content Include="Images\0095-kim-jong-un-what-do-you-mean.jpg" />
-    <Content Include="Images\0095-kim-jong-un-whine-press-conference.jpg" />
-    <Content Include="Images\0096-kim-jong-un-frown.jpg" />
-    <Content Include="Images\0096-kim-jong-un-golf-clap.jpg" />
-    <Content Include="Images\0096-kim-jong-un-salute.jpg" />
-    <Content Include="Images\0096-lame-pun-coon.jpg" />
-    <Content Include="Images\0097-laughing-men-in-suits.jpg" />
-    <Content Include="Images\0098-laughing-villains.jpg" />
-    <Content Include="Images\0099-laundry-viking.jpg" />
-    <Content Include="Images\0100-lazy-college-senior.jpg" />
-    <Content Include="Images\0101-liam-neeson-taken.jpg" />
-    <Content Include="Images\0101-love-you-puppy.jpg" />
-    <Content Include="Images\0102-malicious-advice-mallard.jpg" />
-    <Content Include="Images\0103-matrix-morpheus.jpg" />
-    <Content Include="Images\0104-mckayla-maroney-not-impressed.jpg" />
-    <Content Include="Images\0105-mr-mackey.jpg" />
-    <Content Include="Images\0106-musically-oblivious-8th-grader.jpg" />
-    <Content Include="Images\0107-neil-degrasse-tyson.jpg" />
-    <Content Include="Images\0108-no-patrick.jpg" />
-    <Content Include="Images\0109-not-bad-obama.jpg" />
-    <Content Include="Images\0110-office-space-lumbergh.jpg" />
-    <Content Include="Images\0111-okay-guy-rage-face2.jpg" />
-    <Content Include="Images\0112-omg-karen.jpg" />
-    <Content Include="Images\0113-one-does-not-simply.jpg" />
-    <Content Include="Images\0114-overly-attached-girlfriend.jpg" />
-    <Content Include="Images\0115-overly-manly-man.jpg" />
-    <Content Include="Images\0116-patriotic-eagle.jpg" />
-    <Content Include="Images\0117-pepperidge-farm-remembers.jpg" />
-    <Content Include="Images\0118-peter-griffin-news.jpg" />
-    <Content Include="Images\0119-philosoraptor.jpg" />
-    <Content Include="Images\0120-pissed-off-obama.jpg" />
-    <Content Include="Images\0121-professor-oak.jpg" />
-    <Content Include="Images\0122-ptsd-clarinet-boy.jpg" />
-    <Content Include="Images\0123-put-it-somewhere-else-patrick.jpg" />
-    <Content Include="Images\0124-question-rage-face.jpg" />
-    <Content Include="Images\0125-rebecca-black.jpg" />
-    <Content Include="Images\0126-redditors-wife.jpg" />
-    <Content Include="Images\0126-resharper-tip.jpg" />
-    <Content Include="Images\0127-right-in-the-childhood.jpg" />
-    <Content Include="Images\0128-ron-swanson.jpg" />
-    <Content Include="Images\0129-rpg-fan.jpg" />
-    <Content Include="Images\0130-samuel-jackson-glance.jpg" />
-    <Content Include="Images\0131-schrute-facts.jpg" />
-    <Content Include="Images\0132-scumbag-brain.jpg" />
-    <Content Include="Images\0133-scumbag-girl.jpg" />
-    <Content Include="Images\0134-scumbag-minecraft.jpg" />
-    <Content Include="Images\0135-scumbag-steve.jpg" />
-    <Content Include="Images\0136-serious-xzibit.jpg" />
-    <Content Include="Images\0137-seriously-face.jpg" />
-    <Content Include="Images\0138-sheltering-suburban-mom.jpg" />
-    <Content Include="Images\0139-shut-up-and-take-my-money-fry.jpg" />
-    <Content Include="Images\0140-skeptical-baby.jpg" />
-    <Content Include="Images\0141-slowpoke.jpg" />
-    <Content Include="Images\0142-snape.jpg" />
-    <Content Include="Images\0143-socially-awkward-penguin.jpg" />
-    <Content Include="Images\0144-socially-awesome-penguin.jpg" />
-    <Content Include="Images\0145-socially-awesome-awkward-penguin.jpg" />
-    <Content Include="Images\0146-south-park-craig.jpg" />
-    <Content Include="Images\0147-sparta-leonidas.jpg" />
-    <Content Include="Images\0148-spiderman-computer-desk.jpg" />
-    <Content Include="Images\0149-spiderman-hospital.jpg" />
-    <Content Include="Images\0150-spiderman-peter-parker.jpg" />
-    <Content Include="Images\0151-success-kid-original.jpg" />
-    <Content Include="Images\0152-success-kid.jpg" />
-    <Content Include="Images\0153-successful-black-man.jpg" />
-    <Content Include="Images\0154-sudden-clarity-clarence.jpg" />
-    <Content Include="Images\0155-super-cool-ski-instructor.jpg" />
-    <Content Include="Images\0156-surprised-koala.jpg" />
-    <Content Include="Images\0157-technologically-impaired-duck.jpg" />
-    <Content Include="Images\0158-the-bobs.jpg" />
-    <Content Include="Images\0159-the-most-interesting-man-in-the-world.jpg" />
-    <Content Include="Images\0160-third-world-skeptical-kid.jpg" />
-    <Content Include="Images\0161-third-world-success-kid.jpg" />
-    <Content Include="Images\0161-thumbs-up-boehner.jpg" />
-    <Content Include="Images\0162-too-damn-high.jpg" />
-    <Content Include="Images\0163-toy-story-everywhere.jpg" />
-    <Content Include="Images\0164-true-story.jpg" />
-    <Content Include="Images\0165-unhelpful-high-school-teacher.jpg" />
-    <Content Include="Images\0166-vengeance-dad.jpg" />
-    <Content Include="Images\0167-what-year-is-it.jpg" />
-    <Content Include="Images\0168-whisper-sloth.jpg" />
-    <Content Include="Images\0169-why-cant-i.jpg" />
-    <Content Include="Images\0170-why-not-zoidberg.jpg" />
-    <Content Include="Images\0173-y-u-no.jpg" />
-    <Content Include="Images\0174-yao-ming.jpg" />
-    <Content Include="Images\0175-yo-dawg-heard-you.jpg" />
-    <Content Include="Images\0176-you-dont-say.jpg" />
-    <Content Include="Images\0177-you-should-feel-bad-zoidberg.jpg" />
-    <Content Include="Images\0178-sad-hamster.jpg" />
-    <Content Include="Images\0179-dr-evil-quotes.jpg" />
-    <Content Include="Images\0180-confession-bear.jpg" />
-    <Content Include="Images\0181-doge.jpg" />
-    <Content Include="Images\0182-csi-sunglasses.jpg" />
-    <Content Include="Images\0183-blackjack-bender.jpg" />
-    <Content Include="Images\0185-phteven.jpg" />
-    <Content Include="newrelic\extensions\CoreInstrumentation.xml" />
-    <Content Include="newrelic\NewRelic.Agent.Core.dll" />
-    <Content Include="newrelic\NewRelic.Profiler.dll" />
-    <Content Include="robots.txt" />
-    <Content Include="Scripts\builder.js" />
-    <Content Include="Scripts\foundation\foundation.js" />
-    <Content Include="Scripts\jquery.js" />
-    <Content Include="Scripts\site.js" />
-    <Content Include="Web.config">
-      <SubType>Designer</SubType>
-    </Content>
-    <Content Include="Web.Debug.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Web.Release.config">
-      <DependentUpon>Web.config</DependentUpon>
-    </Content>
-    <Content Include="Views\Web.config" />
-  </ItemGroup>
-  <ItemGroup />
-  <ItemGroup>
-    <Content Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Fonts\SFActionManExtended.ttf" />
-    <Content Include="Fonts\ShyFoundry Freeware EULA.pdf" />
-    <Content Include="Fonts\SFActionManExtended-Italic.ttf" />
-    <Content Include="newrelic\extensions\extension.xsd">
-      <SubType>Designer</SubType>
-    </Content>
-    <None Include="Properties\PublishProfiles\upboatme.pubxml" />
-    <Content Include="Views\Home\Terms.cshtml" />
-    <Content Include="Views\Meme\Debug.cshtml" />
-    <Content Include="Views\Home\Privacy.cshtml" />
-    <Content Include="Views\Shared\_Foundation.cshtml" />
-    <Content Include="Views\Home\Index.cshtml" />
-    <Content Include="Views\_ViewStart.cshtml" />
-    <Content Include="Views\Home\Pricing.cshtml" />
-    <Content Include="Views\Shared\BuilderPartial.cshtml" />
-    <Content Include="Views\Home\RecentMemes.cshtml" />
-    <Content Include="Views\Home\HowTo.cshtml" />
-    <Content Include="Views\Meme\List.cshtml" />
-    <Content Include="Views\Meme\Builder.cshtml" />
-    <Content Include="Views\Meme\ListItemPartial.cshtml" />
-    <None Include="Web.ProdDeploy.config">
-      <DependentUpon>Web.config</DependentUpon>
+    <None Update="App_Data\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="Fonts\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="Content\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="Images\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="Scripts\**\*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </None>
+    <None Update="robots.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\UpboatMe.Imaging\UpboatMe.Imaging.csproj">
-      <Project>{b5c8dbd8-2f64-4a79-a408-d03ce3871884}</Project>
-      <Name>UpboatMe.Imaging</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <PropertyGroup>
-    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'ProdDeploy|AnyCPU'">
-    <OutputPath>bin\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
-  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
-  <Target Name="MvcBuildViews" AfterTargets="AfterBuild" Condition="'$(MvcBuildViews)'=='true'">
-    <AspNetCompiler VirtualPath="temp" PhysicalPath="$(WebProjectOutputDir)" />
-  </Target>
-  <ProjectExtensions>
-    <VisualStudio>
-      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
-        <WebProjectProperties>
-          <UseIIS>True</UseIIS>
-          <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>64658</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:64658/</IISUrl>
-          <NTLMAuthentication>False</NTLMAuthentication>
-          <UseCustomServer>False</UseCustomServer>
-          <CustomServerUrl>
-          </CustomServerUrl>
-          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
-        </WebProjectProperties>
-      </FlavorProperties>
-    </VisualStudio>
-  </ProjectExtensions>
-  <PropertyGroup>
-    <PreBuildEvent>git log -1 --format="%25%25ad %25%25h" --date=short &gt; "$(ProjectDir)App_Data\version.txt"</PreBuildEvent>
-  </PropertyGroup>
-  <Import Project="$(SolutionDir)\.nuget\NuGet.targets" Condition="Exists('$(SolutionDir)\.nuget\NuGet.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target> -->
 </Project>

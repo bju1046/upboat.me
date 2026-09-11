@@ -1,52 +1,48 @@
 ﻿using System;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Web.Http;
+using Microsoft.AspNetCore.Mvc;
 using UpboatMe.Models;
 
 namespace UpboatMe.Controllers
 {
-    public class ListController : ApiController
+    [ApiController]
+    [Route("api/list")]
+    public class ListController : ControllerBase
     {
-        public HttpResponseMessage Get()
+        [HttpGet]
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
+        public IActionResult Get()
         {
             var result = GlobalMemeConfiguration
-                .Memes
-                .GetMemes()
+                .Memes.GetMemes()
                 .Select(m => new ApiMemeResult
-                                 {
-                                     Name = m.Aliases.Last(),
-                                     Description = m.Description,
-                                     Aliases = m.Aliases
-                                 });
+                {
+                    Name = m.Aliases.Last(),
+                    Description = m.Description,
+                    Aliases = m.Aliases,
+                });
 
-            return HttpCachedResponseMessage(result);
+            return Ok(result);
         }
 
-        public HttpResponseMessage Get(string id)
+        [HttpGet("{id}")]
+        [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
+        public IActionResult Get(string id)
         {
             var meme = GlobalMemeConfiguration.Memes[id];
-            var result = new ApiMemeResult
-                             {
-                                 Name = meme.Aliases.Last(),
-                                 Description = meme.Description,
-                                 Aliases = meme.Aliases
-                             };
-
-            return HttpCachedResponseMessage(result);
-        }
-
-        private HttpResponseMessage HttpCachedResponseMessage<T>(T result)
-        {
-            var response = Request.CreateResponse(HttpStatusCode.OK, result);
-            response.Headers.CacheControl = new CacheControlHeaderValue
+            if (meme == null)
             {
-                MaxAge = TimeSpan.FromHours(1),
-                Public = true
+                return NotFound();
+            }
+
+            var result = new ApiMemeResult
+            {
+                Name = meme.Aliases.Last(),
+                Description = meme.Description,
+                Aliases = meme.Aliases,
             };
-            return response;
+
+            return Ok(result);
         }
     }
 }

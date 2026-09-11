@@ -9,7 +9,7 @@
             <select name="name">
                 @for (var x = 0; x < Model.Memes.Count; x++)
                 {
-                    <option data-line-count="@Model.Memes[x].Lines.Count" value="@Model.Memes[x].Aliases.First()" @(Model.Memes[x].Aliases.First() == Model.SelectedMeme ? "selected='selected'" : "")>
+                    <option data-line-count="@Model.Memes[x].Lines.Count" value="@Model.Memes[x].Aliases.First()" selected="@(Model.Memes[x].Aliases.First() == Model.SelectedMeme ? "selected" : null)">
                         @Model.Memes[x].Description
                     </option>
                 }

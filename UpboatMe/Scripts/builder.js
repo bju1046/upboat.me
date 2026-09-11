@@ -11,12 +11,12 @@
                 $('#builder-form').find('.builder-line').remove();
                 var count = $(this).find('option:selected').attr('data-line-count');
                 for (var x = count; x > 0; x--) {
-                    $('<input type="text" class="builder-line" value="' + (builder.lines[x-1] || '') + '" placeholder="line ' + x + '"/>').insertAfter('#builder-form select[name=name]');
+                    $('<input type="text" class="builder-line" value="' + (builder.lines[x - 1] || '') + '" placeholder="line ' + x + '"/>').insertAfter('#builder-form select[name=name]');
                 }
             });
 
             var typingTimer = null;
-            $(document).on('keyup', 'input.builder-line', function () {
+            $(document).on('input', 'input.builder-line', function () {
                 if (typingTimer) {
                     clearTimeout(typingTimer);
                 }
@@ -57,8 +57,10 @@
             this.updateUrlState(memePath);
         }
     },
-    updatePreview: function (memePath) {        
-        $('#meme-preview').attr('src', this.rootUrl + memePath);
+    updatePreview: function (memePath) {
+        var previewUrl = this.rootUrl + memePath;
+        $('#meme-preview').attr('src', previewUrl);
+        $('#meme-preview').closest('a').attr('href', previewUrl);
     },
     updateShareUrl: function (memePath) {
         var shareUrl = this.rootUrl + memePath.replace(/ /g, '-');

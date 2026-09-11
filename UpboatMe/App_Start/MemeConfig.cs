@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Text;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Web;
+using UpboatMe.Imaging;
 using UpboatMe.Models;
 using UpboatMe.Utilities;
 
@@ -109,17 +107,24 @@ namespace UpboatMe.App_Start
             return CultureInfo.InvariantCulture.TextInfo.ToTitleCase(memeName);
         }
 
-        public static readonly PrivateFontCollection PrivateFontCollection =
-            new PrivateFontCollection();
+        public static readonly Dictionary<string, string> PrivateFontFiles = new Dictionary<
+            string,
+            string
+        >(StringComparer.OrdinalIgnoreCase);
 
-        public static void RegisterManualMemes(MemeConfiguration memes)
+        public static void RegisterManualMemes(MemeConfiguration memes, string contentRootPath)
         {
             var sfActionManExtendedFontPath = Path.Combine(
-                HttpRuntime.AppDomainAppPath,
+                contentRootPath,
                 "Fonts",
                 "SFActionManExtended.ttf"
             );
-            PrivateFontCollection.AddFontFile(sfActionManExtendedFontPath);
+            PrivateFontFiles["SF Action Man Extended"] = sfActionManExtendedFontPath;
+            PrivateFontFiles["SF Action Man Extended Italic"] = Path.Combine(
+                contentRootPath,
+                "Fonts",
+                "SFActionManExtended-Italic.ttf"
+            );
 
             // overrides
             memes["10guy"].Aliases.Add("tenguy");
@@ -148,25 +153,25 @@ namespace UpboatMe.App_Start
             foreach (var line in batman.Lines)
             {
                 line.Font = "SF Action Man Extended";
-                line.Fill = Color.FromArgb(255, 63, 63, 63);
+                line.Fill = MemeColor.FromArgb(255, 63, 63, 63);
                 line.StrokeWidth = -1;
-                line.FontStyle = FontStyle.Italic;
+                line.FontStyle = MemeFontStyle.Italic;
             }
-            batman.Lines[0].Bounds = new Rectangle(10, 5, 180, 75);
-            batman.Lines[1].Bounds = new Rectangle(220, 5, 170, 75);
+            batman.Lines[0].Bounds = new MemeRectangle(10, 5, 180, 75);
+            batman.Lines[1].Bounds = new MemeRectangle(220, 5, 170, 75);
             batman.Lines[1].HugBottom = false;
 
             var resharper = memes["resharpertip"];
             foreach (var line in resharper.Lines)
             {
                 line.Font = "Segoe UI";
-                line.TextAlignment = StringAlignment.Near;
-                line.Fill = Color.WhiteSmoke;
+                line.TextAlignment = MemeTextAlignment.Near;
+                line.Fill = MemeColors.FromName("WhiteSmoke");
                 line.StrokeWidth = -1;
                 line.DoForceTextToAllCaps = false;
             }
-            resharper.Lines[0].Bounds = new Rectangle(78, 72, 481, 22);
-            resharper.Lines[1].Bounds = new Rectangle(78, 97, 462, 22);
+            resharper.Lines[0].Bounds = new MemeRectangle(78, 72, 481, 22);
+            resharper.Lines[1].Bounds = new MemeRectangle(78, 97, 462, 22);
             resharper.Lines[1].HugBottom = false;
 
             var doge = memes["doge"];
@@ -174,51 +179,51 @@ namespace UpboatMe.App_Start
             foreach (var line in doge.Lines)
             {
                 line.Font = "Comic Sans MS";
-                line.TextAlignment = StringAlignment.Near;
+                line.TextAlignment = MemeTextAlignment.Near;
                 line.StrokeWidth = -1;
                 //line.FontStyle = FontStyle.Bold;
             }
-            doge.Lines[0].Bounds = new Rectangle(30, 30, 400, 100);
-            doge.Lines[0].Fill = Color.HotPink;
+            doge.Lines[0].Bounds = new MemeRectangle(30, 30, 400, 100);
+            doge.Lines[0].Fill = MemeColors.FromName("HotPink");
             doge.Lines[0].FontSize = 50;
 
-            doge.Lines[1].Bounds = new Rectangle(20, 120, 550, 100);
-            doge.Lines[1].TextAlignment = StringAlignment.Far;
-            doge.Lines[1].Fill = Color.ForestGreen;
+            doge.Lines[1].Bounds = new MemeRectangle(20, 120, 550, 100);
+            doge.Lines[1].TextAlignment = MemeTextAlignment.Far;
+            doge.Lines[1].Fill = MemeColors.FromName("ForestGreen");
             doge.Lines[1].FontSize = 32;
 
-            doge.Lines[2].Bounds = new Rectangle(50, 460, 400, 100);
-            doge.Lines[2].Fill = Color.Yellow;
+            doge.Lines[2].Bounds = new MemeRectangle(50, 460, 400, 100);
+            doge.Lines[2].Fill = MemeColors.FromName("Yellow");
             doge.Lines[2].FontSize = 24;
 
-            doge.Lines[3].Bounds = new Rectangle(20, 530, 580, 100);
-            doge.Lines[3].TextAlignment = StringAlignment.Far;
-            doge.Lines[3].Fill = Color.Blue;
+            doge.Lines[3].Bounds = new MemeRectangle(20, 530, 580, 100);
+            doge.Lines[3].TextAlignment = MemeTextAlignment.Far;
+            doge.Lines[3].Fill = MemeColors.FromName("Blue");
             doge.Lines[3].FontSize = 20;
 
-            doge.Lines[4].Bounds = new Rectangle(20, 350, 510, 100);
-            doge.Lines[4].TextAlignment = StringAlignment.Far;
-            doge.Lines[4].Fill = Color.Orange;
+            doge.Lines[4].Bounds = new MemeRectangle(20, 350, 510, 100);
+            doge.Lines[4].TextAlignment = MemeTextAlignment.Far;
+            doge.Lines[4].Fill = MemeColors.FromName("Orange");
             doge.Lines[4].FontSize = 36;
 
-            doge.Lines[5].Bounds = new Rectangle(20, 220, 560, 100);
-            doge.Lines[5].TextAlignment = StringAlignment.Far;
-            doge.Lines[5].Fill = Color.Red;
+            doge.Lines[5].Bounds = new MemeRectangle(20, 220, 560, 100);
+            doge.Lines[5].TextAlignment = MemeTextAlignment.Far;
+            doge.Lines[5].Fill = MemeColors.FromName("Red");
             doge.Lines[5].FontSize = 22;
 
             var csi = memes["csisunglasses"];
             csi.Lines = Enumerable.Range(0, 4).Select(i => new LineConfig()).ToList();
             foreach (var line in csi.Lines)
             {
-                line.Fill = Color.Black;
+                line.Fill = MemeColors.FromName("Black");
                 line.Font = "SF Action Man Extended";
                 line.StrokeWidth = -1;
-                line.TextAlignment = StringAlignment.Center;
+                line.TextAlignment = MemeTextAlignment.Center;
             }
-            csi.Lines[0].Bounds = new Rectangle(12, 18, 231, 58);
-            csi.Lines[1].Bounds = new Rectangle(190, 94, 78, 18);
-            csi.Lines[2].Bounds = new Rectangle(311, 33, 207, 61);
-            csi.Lines[3].Bounds = new Rectangle(35, 342, 196, 49);
+            csi.Lines[0].Bounds = new MemeRectangle(12, 18, 231, 58);
+            csi.Lines[1].Bounds = new MemeRectangle(190, 94, 78, 18);
+            csi.Lines[2].Bounds = new MemeRectangle(311, 33, 207, 61);
+            csi.Lines[3].Bounds = new MemeRectangle(35, 342, 196, 49);
         }
     }
 }

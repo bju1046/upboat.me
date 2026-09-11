@@ -1,2 +1,4 @@
 ﻿@model UpboatMe.Models.Meme
-<a href="@Url.Action("Builder", "Meme")/@Model.Aliases[0]" class="meme-thumb">@Html.ThumbImage(Model.ImageFileNameWithoutExtension)</a>
+<a href="@Url.Action("Builder", "Meme")/@Model.Aliases[0]" class="meme-thumb" title="@Model.Description (@Model.Aliases[0])" aria-label="@Model.Description (@Model.Aliases[0])">
+	<img class="thumb" src="@Url.Content(Model.ImagePath)" alt="@Model.Description" />
+</a>
