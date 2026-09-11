@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using UpboatMe.App_Start;
@@ -41,9 +42,14 @@ public class MemeController : Controller
             || requestPath.EndsWith(".png", StringComparison.OrdinalIgnoreCase);
         if (!hasExtension)
         {
-            return Redirect(
-                requestPath + Path.GetExtension(meme.ImageFileName) + Request.QueryString
-            );
+            var encodedPathAndQuery = Request.GetEncodedPathAndQuery();
+            var queryStart = encodedPathAndQuery.IndexOf('?');
+            var encodedPath = queryStart >= 0
+                ? encodedPathAndQuery[..queryStart]
+                : encodedPathAndQuery;
+            var query = queryStart >= 0 ? encodedPathAndQuery[queryStart..] : string.Empty;
+
+            return Redirect(encodedPath + Path.GetExtension(meme.ImageFileName) + query);
         }
 
         var contentRoot = HttpContext

@@ -47,9 +47,9 @@
         for (var i = 0; i < inputs.length; i++) {
             this.lines.push($(inputs[i]).val());
         }
-        var memePath = this.currentMeme + '/';
+        var memePath = encodeURIComponent(this.currentMeme) + '/';
         for (var i = 0; i < this.lines.length; i++) {
-            memePath += this.lines[i] + '/';
+            memePath += encodeURIComponent(this.lines[i]) + '/';
         }
         this.updatePreview(memePath);
         this.updateShareUrl(memePath);
@@ -63,7 +63,7 @@
         $('#meme-preview').closest('a').attr('href', previewUrl);
     },
     updateShareUrl: function (memePath) {
-        var shareUrl = this.rootUrl + memePath.replace(/ /g, '-');
+        var shareUrl = this.rootUrl + memePath.replace(/%20/g, '-');
         var shareText = $('#builder-form select[name=name] :selected').text().trim();
         $('#share-url').html(shareUrl);
         $('#share-fb').attr('href', 'https://www.facebook.com/sharer/sharer.php?u=' + shareUrl);

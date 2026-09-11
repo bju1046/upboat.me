@@ -184,5 +184,17 @@ namespace UpboatMeTests
             Assert.IsNotNull(actualMeme);
             Assert.AreEqual(expectedName, actualMeme.Description);
         }
+
+        [TestMethod]
+        public void MemeRequestPreservesEncodedQuestionMarksBeforeExtension()
+        {
+            var request = MemeRequest.FromUrl(
+                "/sk/dot-jaypeg-really%3F%3F%3F%3F/toys-everywhere/.jpg",
+                "/"
+            );
+
+            Assert.AreEqual("dot-jaypeg-really????", request.Lines[0]);
+            Assert.AreEqual("toys-everywhere", request.Lines[1]);
+        }
     }
 }
