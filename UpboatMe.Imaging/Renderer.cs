@@ -112,7 +112,8 @@ namespace UpboatMe.Imaging
             var typeface = ResolveTypeface(
                 parameters,
                 parameters.WatermarkFont,
-                parameters.WatermarkFontStyle
+                parameters.WatermarkFontStyle,
+                parameters.WatermarkText
             );
             using var fillPaint = CreateTextPaint(
                 typeface,
@@ -162,7 +163,7 @@ namespace UpboatMe.Imaging
             }
 
             var fontSize = line.FontSize;
-            var typeface = ResolveTypeface(parameters, line.Font, line.FontStyle);
+            var typeface = ResolveTypeface(parameters, line.Font, line.FontStyle, line.Text);
 
             while (true)
             {
@@ -207,7 +208,8 @@ namespace UpboatMe.Imaging
         private SKTypeface ResolveTypeface(
             RenderParameters parameters,
             string fontName,
-            MemeFontStyle style
+            MemeFontStyle style,
+            string text
         )
         {
             if (
@@ -215,7 +217,14 @@ namespace UpboatMe.Imaging
                 && File.Exists(fontFilePath)
             )
             {
-                return _privateTypefaces.GetOrAdd(fontName, _ => SKTypeface.FromFile(fontFilePath));
+                var privateTypeface = _privateTypefaces.GetOrAdd(
+                    fontName,
+                    _ => SKTypeface.FromFile(fontFilePath)
+                );
+                if (privateTypeface != null && privateTypeface.ContainsGlyphs(text))
+                {
+                    return privateTypeface;
+                }
             }
 
             var skStyle = style switch
@@ -233,7 +242,7 @@ namespace UpboatMe.Imaging
             foreach (var candidate in candidates)
             {
                 var resolved = SKTypeface.FromFamilyName(candidate, skStyle);
-                if (resolved != null)
+                if (resolved != null && resolved.ContainsGlyphs(text))
                 {
                     return resolved;
                 }
