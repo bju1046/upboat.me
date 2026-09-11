@@ -114,6 +114,11 @@ namespace UpboatMe.App_Start
 
         public static void RegisterManualMemes(MemeConfiguration memes, string contentRootPath)
         {
+            PrivateFontFiles["Impact"] = Path.Combine(
+                contentRootPath,
+                "Fonts",
+                "Anton-Regular.ttf"
+            );
             var sfActionManExtendedFontPath = Path.Combine(
                 contentRootPath,
                 "Fonts",
